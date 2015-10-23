@@ -9,6 +9,9 @@
 #import "ViewController.h"
 
 #import "ASYammerModel.h"
+NSString * const ASMessageApiString = @"/api/v1/messages.json";
+NSString * const ASUserInfoApiString = @"/api/v1/users/current.json";
+
 @interface ViewController ()<ASYammerDelegate>
 {
     IBOutlet UIButton *loginButton;
@@ -20,6 +23,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+   
+    //Configure Client Yammer
+    [self configureLoginClient];
     
 }
 #pragma mark-Custom Actions
@@ -27,6 +33,7 @@
 - (IBAction)login:(id)sender
 {
     [[ASYammerModel sharedInstance]YammerLogin];
+    [ASYammerModel sharedInstance].delegate = self;
 }
 #pragma mark-Custom Action Post/Get Message
 //Trigger this method to post message to yammer api.
@@ -43,6 +50,22 @@
 {
     [self getYammerMessage];
 }
+#pragma custom method
+- (void)configureLoginClient
+{
+    //To get  Client id and secret, login yammer and create new app to get the  credentials
+    //https://www.yammer.com/apps?from=nav
+    
+    /* Add your client ID here */
+    [[ASYammerModel sharedInstance] setAppClientID:@"YOUR_CLIENT_ID"];
+    
+    /* Add your client secret here */
+    [[ASYammerModel sharedInstance] setAppClientSecret:@"YOUR_CLIENT_SECRET"];
+    
+    /* Add your authorization redirect URI here */
+    [[ASYammerModel sharedInstance] setAuthRedirectURI:@"YOUR_REDIRECT_URI"];
+}
+
 #pragma mark-Private method
 //call this method to get message from yammer
 - (void)getYammerMessage
@@ -53,7 +76,7 @@
         // Query params (in this case there are no params, but if there were, this is how you'd add them)
         NSDictionary *params = @{ @"threaded": @"extended", @"limit": @30 };
         
-        [[ASYammerModel sharedInstance]getYammerMessage:params success:^(id responseObject) {
+        [[ASYammerModel sharedInstance]getAPi:params apiPath:ASMessageApiString success:^(id responseObject) {
             
             NSLog(@"Message-%@",responseObject);
             
@@ -62,7 +85,31 @@
             NSLog(@"error: %@", error);
         }
          ];
-    
+        
+    }else{
+        
+        NSLog(@"Not logged in Yammer");
+        //call this method to get login in yammer
+        [[ASYammerModel sharedInstance]YammerLogin];
+    }
+}
+
+//call this method to get logged in user info
+- (void)getCurrentUserInfo
+{
+    //Check token is exists
+    if([[ASYammerModel sharedInstance] getYammerToken]){
+        
+        [[ASYammerModel sharedInstance]getAPi:nil apiPath:ASUserInfoApiString success:^(id responseObject) {
+            
+            NSLog(@"Message-%@",responseObject);
+            
+        } failureCallback:^(NSError *error) {
+            
+            NSLog(@"error: %@", error);
+        }
+         ];
+        
     }else{
         
         NSLog(@"Not logged in Yammer");
@@ -76,7 +123,7 @@
 {
     // Query params (in this case there are no params, but if there were, this is how you'd add them)
     NSDictionary *params = @{ @"body": @"REPLACE_REPLY_MESSAGE_HERE",@"replied_to_id":@"REPLACE_YAMMER_REPLY_ID_HERE"};
-    [[ASYammerModel sharedInstance]postYammerMessage:params success:^(id responseObject) {
+    [[ASYammerModel sharedInstance]postApi:params apiPath:ASMessageApiString success:^(id responseObject) {
         
         NSLog(@"Message-%@",responseObject);
         

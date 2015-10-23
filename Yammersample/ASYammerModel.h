@@ -18,9 +18,12 @@ typedef void(^failureCallBack)(NSError *error);
 - (void)YammerLogin;
 - (void)YammerLogout;
 - (NSString*)getYammerToken;
-- (void)getYammerMessage:(NSDictionary*)parameters success:(successCallBack)success failureCallback:(failureCallBack)failure;
-- (void)postYammerMessage:(NSDictionary*)parameters success:(successCallBack)success failureCallback:(failureCallBack)failure;
+- (void)getAPi:(NSDictionary*)parameters apiPath:(NSString*)apipath success:(successCallBack)success failureCallback:(failureCallBack)failure;
+- (void)postApi:(NSDictionary*)parameters apiPath:(NSString*)apipath success:(successCallBack)success failureCallback:(failureCallBack)failure;
 @property (nonatomic, weak) id<ASYammerDelegate> delegate;
+@property (nonatomic, copy) NSString *appClientID;
+@property (nonatomic, copy) NSString *appClientSecret;
+@property (nonatomic, copy) NSString *authRedirectURI;
 @end
 
 //Delegates for Yammer Login

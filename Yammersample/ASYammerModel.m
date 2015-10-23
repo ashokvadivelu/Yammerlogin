@@ -9,7 +9,7 @@
 #import "ASYammerModel.h"
 #import <YammerSDK/YMLoginClient.h>
 #import <YammerSDK/YMAPIClient.h>
-NSString * const ASMessageApiString = @"/api/v1/messages.json";
+
 @interface ASYammerModel ()<YMLoginClientDelegate>
 @end
 @implementation ASYammerModel
@@ -26,6 +26,8 @@ NSString * const ASMessageApiString = @"/api/v1/messages.json";
 //call this method to get login in yammer
 -(void)YammerLogin
 {
+    
+    [self configureLoginClient];
     [YMLoginClient sharedInstance].delegate = self;
     [[YMLoginClient sharedInstance] startLogin];
 }
@@ -34,19 +36,33 @@ NSString * const ASMessageApiString = @"/api/v1/messages.json";
 {
     [[YMLoginClient sharedInstance] clearAuthTokens];
 }
+#pragma custom method
+- (void)configureLoginClient
+{
+    /* Add your client ID here */
+    [[YMLoginClient sharedInstance] setAppClientID:self.appClientID];
+    
+    /* Add your client secret here */
+    [[YMLoginClient sharedInstance] setAppClientSecret:self.appClientSecret];
+    
+    /* Add your authorization redirect URI here */
+    [[YMLoginClient sharedInstance] setAuthRedirectURI:self.authRedirectURI];
+}
+
 #pragma mark-Token
 - (NSString*)getYammerToken
 {
     return [[YMLoginClient sharedInstance] storedAuthToken];
 }
+
 #pragma mark- Yammer Blocks Post/Get messages from Yammer
 //Get the message from the yammer using Yammer auth token and get the response in callback and send success/failure response
-- (void)getYammerMessage:(NSDictionary*)parameters success:(successCallBack)success failureCallback:(failureCallBack)failure
+- (void)getAPi:(NSDictionary*)parameters apiPath:(NSString*)apipath success:(successCallBack)success failureCallback:(failureCallBack)failure
 {
     YMAPIClient *client = [[YMAPIClient alloc] initWithAuthToken:[self getYammerToken]];
     // the postPath is where the path is appended to the baseUrl
     // the params are the query params
-    [client getPath:ASMessageApiString
+    [client getPath:apipath
          parameters:parameters
             success:^(id responseObject) {
                 success(responseObject);
@@ -59,11 +75,12 @@ NSString * const ASMessageApiString = @"/api/v1/messages.json";
             }
      ];
 }
+
 //Post the message to the yammer using Yammer auth token and get the response in callback and send success/failure response
-- (void)postYammerMessage:(NSDictionary*)parameters success:(successCallBack)success failureCallback:(failureCallBack)failure
+- (void)postApi:(NSDictionary*)parameters apiPath:(NSString*)apipath success:(successCallBack)success failureCallback:(failureCallBack)failure
 {
     YMAPIClient *client = [[YMAPIClient alloc] initWithAuthToken:[self getYammerToken]];
-    [client postPath:ASMessageApiString
+    [client postPath:apipath
           parameters:parameters
              success:^(id responseObject) {
                   success(responseObject);

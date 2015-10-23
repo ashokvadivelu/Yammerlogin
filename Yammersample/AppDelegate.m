@@ -20,7 +20,7 @@
     // Override point for customization after application launch.
     
     //Configure credential for yammer login
-    [self configureLoginClient];
+    
    
     return YES;
 }
@@ -56,16 +56,5 @@
     // URL was not a match, or came from an application other than Safari
     return NO;
 }
-#pragma custom method
-- (void)configureLoginClient
-{
-    /* Add your client ID here */
-    [[YMLoginClient sharedInstance] setAppClientID:@"Xs4faJiKI6bUL9XF9tAOA"];
-    
-    /* Add your client secret here */
-    [[YMLoginClient sharedInstance] setAppClientSecret:@"0apnVkkWsv8EnUDm4gYL4pjrk2DvY58anDeLJDyGo"];
-    
-    /* Add your authorization redirect URI here */
-    [[YMLoginClient sharedInstance] setAuthRedirectURI:@"movetoyammersample://example.com"];
-}
+
 @end
